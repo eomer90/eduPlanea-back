@@ -92,27 +92,37 @@ server.patch(ALUMNOS_ROUTE, async (req, res) => {
     const { fecha, asistencia } = req.body;
 
     for (const alumno of asistencia) {
-      await Alumnos.findByIdAndUpdate(
-        alumno.id,
-        {
-          $push: {
-            asistencias: {
-              fecha: fecha,
-              estado: alumno.estado,
-              observaciones: alumno.observaciones,
-            },
-          },
-        },
-        { new: true },
+      const alumnoEncontrado = await Alumnos.findById(alumno.id);
+
+      if (!alumnoEncontrado) {
+        continue;
+      }
+
+      const asistenciaExistente = alumnoEncontrado.asistencias.find(
+        (asis) => asis.fecha === fecha,
       );
+
+      if (asistenciaExistente) {
+        asistenciaExistente.estado = alumno.estado;
+        asistenciaExistente.observaciones = alumno.observaciones;
+      } else {
+        alumnoEncontrado.asistencias.push({
+          fecha,
+          estado: alumno.estado,
+          observaciones: alumno.observaciones,
+        });
+      }
+
+      await alumnoEncontrado.save();
     }
 
-    const mensaje = "Asistencia registrada con éxito";
-
-    res.status(200).json({ mensaje });
+    res.status(200).json({
+      mensaje: "Asistencia registrada con éxito",
+    });
   } catch (error) {
-    const mensaje = "Error al registrar asistencia";
-
-    res.status(500).json({ error, mensaje });
+    res.status(500).json({
+      mensaje: "Error al registrar asistencia",
+      error,
+    });
   }
 });
