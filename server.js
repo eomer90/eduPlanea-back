@@ -63,6 +63,18 @@ server.get(ALUMNOS_ROUTE, async (req, res) => {
   }
 });
 
+server.get(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const alumnoEncontrado = await Alumnos.findById(id);
+    const mensaje = "Alumno encontrado con éxito";
+    res.status(200).json({ mensaje, alumnoEncontrado });
+  } catch (error) {
+    const mensaje = "Error al encontrar alumno";
+    res.status(500).json({ mensaje, error });
+  }
+});
+
 server.post(CLASES_ROUTE, async (req, res) => {
   try {
     const data = req.body;
