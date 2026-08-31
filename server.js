@@ -21,6 +21,7 @@ const levantarServer = async () => {
       console.log(`Server connected to port ${PORT}`);
     });
     console.log("MongoDb connected");
+    console.log("Base de datos:", mongoose.connection.name);
   } catch (error) {
     console.log(error, "Error connecting MongoDb");
   }
