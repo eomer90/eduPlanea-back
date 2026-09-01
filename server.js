@@ -102,18 +102,14 @@ server.post(ALUMNOS_ROUTE, async (req, res) => {
 server.patch(ALUMNOS_ROUTE, async (req, res) => {
   try {
     const { fecha, asistencia } = req.body;
-
     for (const alumno of asistencia) {
       const alumnoEncontrado = await Alumnos.findById(alumno.id);
-
       if (!alumnoEncontrado) {
         continue;
       }
-
       const asistenciaExistente = alumnoEncontrado.asistencias.find(
         (asis) => asis.fecha === fecha,
       );
-
       if (asistenciaExistente) {
         asistenciaExistente.estado = alumno.estado;
         asistenciaExistente.observaciones = alumno.observaciones;
@@ -124,16 +120,47 @@ server.patch(ALUMNOS_ROUTE, async (req, res) => {
           observaciones: alumno.observaciones,
         });
       }
-
       await alumnoEncontrado.save();
     }
-
     res.status(200).json({
       mensaje: "Asistencia registrada con éxito",
     });
   } catch (error) {
     res.status(500).json({
       mensaje: "Error al registrar asistencia",
+      error,
+    });
+  }
+});
+
+server.patch(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const datos = req.body;
+    const alumnoActualizado = await Alumnos.findByIdAndUpdate(id, datos, {
+      new: true,
+    });
+    const mensaje = "Alumno actualizado con éxito";
+    res.status(200).json({ mensaje, alumnoActualizado });
+  } catch (error) {
+    const mensaje = "Error al actualizar alumno";
+    res.status(500).json({ mensaje, error });
+  }
+});
+
+server.delete(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const alumnoEliminado = await Alumnos.findByIdAndDelete(id);
+    const mensaje = "Alumno eliminado con éxito";
+    res.status(200).json({
+      mensaje,
+      alumnoEliminado,
+    });
+  } catch (error) {
+    const mensaje = "Error al eliminar alumno";
+    res.status(500).json({
+      mensaje,
       error,
     });
   }
