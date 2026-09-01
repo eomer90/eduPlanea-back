@@ -7,21 +7,32 @@ const AlumnoSchema = new mongoose.Schema(
     apellidoMaterno: String,
     grado: String,
     grupo: String,
-    asistencias: [
+
+    materias: [
       {
-        fecha: String,
-        estado: {
-          type: String,
-          enum: ["presente", "falta", "retardo", "justificado"],
-        },
-        observaciones: String,
+        nombre: String,
+
+        asistencias: [
+          {
+            fecha: String,
+            estado: {
+              type: String,
+              enum: ["presente", "falta", "retardo", "justificado"],
+            },
+            observaciones: String,
+          },
+        ],
+
+        evaluaciones: [
+          {
+            tipoEvaluacion: String,
+            resultado: String,
+          },
+        ],
+
+        calificaciones: String,
       },
     ],
-
-    calificacion: {
-      type: Number,
-      default: null,
-    },
   },
   {
     collection: "alumnos",
