@@ -102,26 +102,20 @@ server.post(ALUMNOS_ROUTE, async (req, res) => {
 server.patch(ALUMNOS_ROUTE, async (req, res) => {
   try {
     const { fecha, materia, asistencia } = req.body;
-
     for (const alumno of asistencia) {
       const alumnoEncontrado = await Alumnos.findById(alumno.id);
-
       if (!alumnoEncontrado) {
         continue;
       }
-
       const materiaEncontrada = alumnoEncontrado.materias.find(
         (mat) => mat.nombre === materia,
       );
-
       if (!materiaEncontrada) {
         continue;
       }
-
       const asistenciaExistente = materiaEncontrada.asistencias.find(
         (asis) => asis.fecha === fecha,
       );
-
       if (asistenciaExistente) {
         asistenciaExistente.estado = alumno.estado;
         asistenciaExistente.observaciones = alumno.observaciones;
@@ -132,10 +126,8 @@ server.patch(ALUMNOS_ROUTE, async (req, res) => {
           observaciones: alumno.observaciones,
         });
       }
-
       await alumnoEncontrado.save();
     }
-
     res.status(200).json({
       mensaje: "Asistencia registrada con éxito",
     });
@@ -151,13 +143,24 @@ server.patch(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
   try {
     const id = req.params.id;
     const datos = req.body;
+
+    datos.materias = datos.materias.map((materia) => ({
+      ...materia,
+      asistencias: materia.asistencias.filter(
+        (asistencia) => asistencia.fecha !== "",
+      ),
+    }));
+
     const alumnoActualizado = await Alumnos.findByIdAndUpdate(id, datos, {
       new: true,
     });
+
     const mensaje = "Alumno actualizado con éxito";
+
     res.status(200).json({ mensaje, alumnoActualizado });
   } catch (error) {
     const mensaje = "Error al actualizar alumno";
+
     res.status(500).json({ mensaje, error });
   }
 });
