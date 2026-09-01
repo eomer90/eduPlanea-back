@@ -101,27 +101,41 @@ server.post(ALUMNOS_ROUTE, async (req, res) => {
 
 server.patch(ALUMNOS_ROUTE, async (req, res) => {
   try {
-    const { fecha, asistencia } = req.body;
+    const { fecha, materia, asistencia } = req.body;
+
     for (const alumno of asistencia) {
       const alumnoEncontrado = await Alumnos.findById(alumno.id);
+
       if (!alumnoEncontrado) {
         continue;
       }
-      const asistenciaExistente = alumnoEncontrado.asistencias.find(
+
+      const materiaEncontrada = alumnoEncontrado.materias.find(
+        (mat) => mat.nombre === materia,
+      );
+
+      if (!materiaEncontrada) {
+        continue;
+      }
+
+      const asistenciaExistente = materiaEncontrada.asistencias.find(
         (asis) => asis.fecha === fecha,
       );
+
       if (asistenciaExistente) {
         asistenciaExistente.estado = alumno.estado;
         asistenciaExistente.observaciones = alumno.observaciones;
       } else {
-        alumnoEncontrado.asistencias.push({
+        materiaEncontrada.asistencias.push({
           fecha,
           estado: alumno.estado,
           observaciones: alumno.observaciones,
         });
       }
+
       await alumnoEncontrado.save();
     }
+
     res.status(200).json({
       mensaje: "Asistencia registrada con éxito",
     });
