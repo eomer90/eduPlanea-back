@@ -16,6 +16,8 @@ const ClasesSchema = new mongoose.Schema(
     ],
     periodoInicio: String,
     periodoFin: String,
+    usuarioId: mongoose.Schema.Types.ObjectId,
+    escuelaId: mongoose.Schema.Types.ObjectId,
   },
   { collection: "clases" },
 );
