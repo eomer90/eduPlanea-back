@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const verificarToken = require("./middleware/auth");
 
 const server = express();
 server.use(express.json());
@@ -34,13 +36,19 @@ levantarServer();
 
 //clases
 
-server.get(CLASES_ROUTE, async (req, res) => {
+server.get(CLASES_ROUTE, verificarToken, async (req, res) => {
   try {
-    const clases = await Clases.find();
+    const clases = await Clases.find({
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
     const mensaje = "Clases encontradas con éxito";
+
     res.status(200).json({ mensaje, clases });
   } catch (error) {
     const mensaje = "Error al encontrar clases";
+
     res.status(500).json({ error, mensaje });
   }
 });
@@ -57,14 +65,22 @@ server.get(`${CLASES_ROUTE}/:id`, async (req, res) => {
   }
 });
 
-server.post(CLASES_ROUTE, async (req, res) => {
+server.post(CLASES_ROUTE, verificarToken, async (req, res) => {
   try {
-    const data = req.body;
+    const data = {
+      ...req.body,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    };
+
     const nuevaClase = await Clases.create(data);
+
     const mensaje = "Nueva clase creada con éxito";
+
     res.status(201).json({ mensaje, nuevaClase });
   } catch (error) {
     const mensaje = "Error al crear nueva clase";
+
     res.status(500).json({ error, mensaje });
   }
 });
@@ -255,6 +271,54 @@ server.post("/registro", async (req, res) => {
     res.status(500).json({
       error,
       mensaje: "Error al realizar el registro",
+    });
+  }
+});
+
+//login
+
+server.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const usuario = await Usuario.findOne({ username });
+    if (!usuario) {
+      return res.status(401).json({
+        error: true,
+        mensaje: "Usuario o contraseña incorrectos",
+      });
+    }
+    const passwordCorrecta = await bcrypt.compare(password, usuario.password);
+    if (!passwordCorrecta) {
+      return res.status(401).json({
+        error: true,
+        mensaje: "Usuario o contraseña incorrectos",
+      });
+    }
+    const token = jwt.sign(
+      {
+        usuarioId: usuario._id,
+        escuelaId: usuario.escuelaId,
+      },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1d",
+      },
+    );
+    res.status(200).json({
+      mensaje: "Inicio de sesión exitoso",
+      token,
+      usuario: {
+        id: usuario._id,
+        nombre: usuario.nombre,
+        username: usuario.username,
+        admin: usuario.admin,
+        escuelaId: usuario.escuelaId,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: true,
+      mensaje: "Error al iniciar sesión",
     });
   }
 });
