@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
+const bcrypt = require("bcrypt");
 
 const server = express();
 server.use(express.json());
@@ -12,6 +13,8 @@ const CLASES_ROUTE = "/clases";
 const ALUMNOS_ROUTE = "/alumnos";
 const Clases = require("./models/Clase");
 const Alumnos = require("./models/Alumno");
+const Escuela = require("./models/Escuela");
+const Usuario = require("./models/Usuario");
 
 const levantarServer = async () => {
   try {
@@ -210,6 +213,48 @@ server.delete(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
     res.status(500).json({
       mensaje,
       error,
+    });
+  }
+});
+
+//registro
+
+server.post("/registro", async (req, res) => {
+  try {
+    const {
+      nombreEscuela,
+      nivelEducativo,
+      nombreUsuario,
+      correo,
+      username,
+      password,
+    } = req.body;
+
+    const nuevaEscuela = await Escuela.create({
+      nombre: nombreEscuela,
+      nivelEducativo,
+    });
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const nuevoUsuario = await Usuario.create({
+      nombre: nombreUsuario,
+      correo,
+      username,
+      password: passwordHash,
+      admin: true,
+      escuelaId: nuevaEscuela._id,
+    });
+
+    res.status(201).json({
+      mensaje: "Registro realizado con éxito",
+      escuela: nuevaEscuela,
+      usuario: nuevoUsuario,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error,
+      mensaje: "Error al realizar el registro",
     });
   }
 });
