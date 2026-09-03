@@ -81,6 +81,18 @@ server.patch(`${CLASES_ROUTE}/:id`, async (req, res) => {
   }
 });
 
+server.delete(`${CLASES_ROUTE}/:id`, async (req, res) => {
+  try {
+    const id = req.params.id;
+    const claseEliminada = await Clases.findByIdAndDelete(id);
+    const mensaje = "Clase eliminada con éxito";
+    res.status(200).json({ mensaje, claseEliminada });
+  } catch (error) {
+    const mensaje = "Error al eliminar clase";
+    res.status(500).json({ mensaje, error });
+  }
+});
+
 //alumnos
 
 server.get(ALUMNOS_ROUTE, async (req, res) => {
