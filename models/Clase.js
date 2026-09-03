@@ -6,6 +6,7 @@ const ClasesSchema = new mongoose.Schema(
     materia: String,
     grado: String,
     grupo: String,
+    salon: String,
     horarios: [
       {
         dia: String,
