@@ -29,6 +29,8 @@ const levantarServer = async () => {
 
 levantarServer();
 
+//clases
+
 server.get(CLASES_ROUTE, async (req, res) => {
   try {
     const clases = await Clases.find();
@@ -52,6 +54,35 @@ server.get(`${CLASES_ROUTE}/:id`, async (req, res) => {
   }
 });
 
+server.post(CLASES_ROUTE, async (req, res) => {
+  try {
+    const data = req.body;
+    const nuevaClase = await Clases.create(data);
+    const mensaje = "Nueva clase creada con éxito";
+    res.status(201).json({ mensaje, nuevaClase });
+  } catch (error) {
+    const mensaje = "Error al crear nueva clase";
+    res.status(500).json({ error, mensaje });
+  }
+});
+
+server.patch(`${CLASES_ROUTE}/:id`, async (req, res) => {
+  try {
+    const data = req.body;
+    const id = req.params.id;
+    const claseActualizada = await Clases.findByIdAndUpdate(id, data, {
+      new: true,
+    });
+    const mensaje = "Clase actualizada con éxito";
+    res.status(200).json({ mensaje, claseActualizada });
+  } catch (error) {
+    const mensaje = "Error al actualizar clase";
+    res.status(500).json({ error, mensaje });
+  }
+});
+
+//alumnos
+
 server.get(ALUMNOS_ROUTE, async (req, res) => {
   try {
     const alumnos = await Alumnos.find();
@@ -72,18 +103,6 @@ server.get(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
   } catch (error) {
     const mensaje = "Error al encontrar alumno";
     res.status(500).json({ mensaje, error });
-  }
-});
-
-server.post(CLASES_ROUTE, async (req, res) => {
-  try {
-    const data = req.body;
-    const nuevaClase = await Clases.create(data);
-    const mensaje = "Nueva clase creada con éxito";
-    res.status(201).json({ mensaje, nuevaClase });
-  } catch (error) {
-    const mensaje = "Error al crear nueva clase";
-    res.status(500).json({ error, mensaje });
   }
 });
 
