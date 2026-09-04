@@ -13,6 +13,7 @@ server.use(cors());
 const PORT = process.env.PORT || 3000;
 const CLASES_ROUTE = "/clases";
 const ALUMNOS_ROUTE = "/alumnos";
+const ESCUELAS_ROUTE = "/escuelas";
 const Clases = require("./models/Clase");
 const Alumnos = require("./models/Alumno");
 const Escuela = require("./models/Escuela");
@@ -451,5 +452,18 @@ server.post("/login", async (req, res) => {
       error: true,
       mensaje: "Error al iniciar sesión",
     });
+  }
+});
+
+//escuelas
+
+server.get(ESCUELAS_ROUTE, async (req, res) => {
+  try {
+    const escuelasEncontradas = await Escuela.find();
+    const mensaje = "Escuelas encontradas con éxito";
+    res.status(200).json({ mensaje, escuelasEncontradas });
+  } catch (error) {
+    const mensaje = "Error al encontrar escuelas";
+    res.status(500).json({ mensaje, error });
   }
 });
