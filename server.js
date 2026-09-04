@@ -316,6 +316,8 @@ server.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
+    console.log("ERROR LOGIN:", error);
+
     res.status(500).json({
       error: true,
       mensaje: "Error al iniciar sesión",
