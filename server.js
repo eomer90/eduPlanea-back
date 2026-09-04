@@ -53,14 +53,29 @@ server.get(CLASES_ROUTE, verificarToken, async (req, res) => {
   }
 });
 
-server.get(`${CLASES_ROUTE}/:id`, async (req, res) => {
+server.get(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
-    const claseEncontrada = await Clases.findById(id);
+
+    const claseEncontrada = await Clases.findOne({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!claseEncontrada) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Clase no encontrada",
+      });
+    }
+
     const mensaje = "Clase encontrada con éxito";
+
     res.status(200).json({ mensaje, claseEncontrada });
   } catch (error) {
     const mensaje = "Error al encontrar clase";
+
     res.status(500).json({ mensaje, error });
   }
 });
@@ -85,87 +100,163 @@ server.post(CLASES_ROUTE, verificarToken, async (req, res) => {
   }
 });
 
-server.patch(`${CLASES_ROUTE}/:id`, async (req, res) => {
+server.patch(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
   try {
-    const data = req.body;
     const id = req.params.id;
-    const claseActualizada = await Clases.findByIdAndUpdate(id, data, {
-      new: true,
-    });
+    const data = req.body;
+
+    const claseActualizada = await Clases.findOneAndUpdate(
+      {
+        _id: id,
+        usuarioId: req.usuarioId,
+        escuelaId: req.escuelaId,
+      },
+      data,
+      {
+        new: true,
+      },
+    );
+
+    if (!claseActualizada) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Clase no encontrada",
+      });
+    }
+
     const mensaje = "Clase actualizada con éxito";
+
     res.status(200).json({ mensaje, claseActualizada });
   } catch (error) {
     const mensaje = "Error al actualizar clase";
+
     res.status(500).json({ error, mensaje });
   }
 });
 
-server.delete(`${CLASES_ROUTE}/:id`, async (req, res) => {
+server.delete(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
-    const claseEliminada = await Clases.findByIdAndDelete(id);
+
+    const claseEliminada = await Clases.findOneAndDelete({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!claseEliminada) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Clase no encontrada",
+      });
+    }
+
     const mensaje = "Clase eliminada con éxito";
-    res.status(200).json({ mensaje, claseEliminada });
+
+    res.status(200).json({
+      mensaje,
+      claseEliminada,
+    });
   } catch (error) {
     const mensaje = "Error al eliminar clase";
-    res.status(500).json({ mensaje, error });
+
+    res.status(500).json({
+      mensaje,
+      error,
+    });
   }
 });
 
 //alumnos
 
-server.get(ALUMNOS_ROUTE, async (req, res) => {
+server.get(ALUMNOS_ROUTE, verificarToken, async (req, res) => {
   try {
-    const alumnos = await Alumnos.find();
+    const alumnos = await Alumnos.find({
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
     const mensaje = "Alumnos encontrados con éxito";
+
     res.status(200).json({ mensaje, alumnos });
   } catch (error) {
     const mensaje = "Error al encontrar alumnos";
+
     res.status(500).json({ mensaje, error });
   }
 });
 
-server.get(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
+server.get(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
-    const alumnoEncontrado = await Alumnos.findById(id);
+
+    const alumnoEncontrado = await Alumnos.findOne({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!alumnoEncontrado) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Alumno no encontrado",
+      });
+    }
+
     const mensaje = "Alumno encontrado con éxito";
+
     res.status(200).json({ mensaje, alumnoEncontrado });
   } catch (error) {
     const mensaje = "Error al encontrar alumno";
+
     res.status(500).json({ mensaje, error });
   }
 });
 
-server.post(ALUMNOS_ROUTE, async (req, res) => {
+server.post(ALUMNOS_ROUTE, verificarToken, async (req, res) => {
   try {
-    const data = req.body;
+    const data = {
+      ...req.body,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    };
+
     const nuevoAlumno = await Alumnos.create(data);
+
     const mensaje = "Nuevo alumno creado con éxito";
+
     res.status(201).json({ mensaje, nuevoAlumno });
   } catch (error) {
-    const mensaje = "Error al crear nuevo alumno";
-    res.status(500).json({ error, mensaje });
+    res.status(500).json({
+      error,
+      mensaje: "Error al crear nuevo alumno",
+    });
   }
 });
 
-server.patch(ALUMNOS_ROUTE, async (req, res) => {
+server.patch(ALUMNOS_ROUTE, verificarToken, async (req, res) => {
   try {
     const { fecha, materia, asistencia } = req.body;
+
     for (const alumno of asistencia) {
-      const alumnoEncontrado = await Alumnos.findById(alumno.id);
-      if (!alumnoEncontrado) {
-        continue;
-      }
+      const alumnoEncontrado = await Alumnos.findOne({
+        _id: alumno.id,
+        usuarioId: req.usuarioId,
+        escuelaId: req.escuelaId,
+      });
+
+      if (!alumnoEncontrado) continue;
+
       const materiaEncontrada = alumnoEncontrado.materias.find(
         (mat) => mat.nombre === materia,
       );
-      if (!materiaEncontrada) {
-        continue;
-      }
+
+      if (!materiaEncontrada) continue;
+
       const asistenciaExistente = materiaEncontrada.asistencias.find(
         (asis) => asis.fecha === fecha,
       );
+
       if (asistenciaExistente) {
         asistenciaExistente.estado = alumno.estado;
         asistenciaExistente.observaciones = alumno.observaciones;
@@ -176,8 +267,10 @@ server.patch(ALUMNOS_ROUTE, async (req, res) => {
           observaciones: alumno.observaciones,
         });
       }
+
       await alumnoEncontrado.save();
     }
+
     res.status(200).json({
       mensaje: "Asistencia registrada con éxito",
     });
@@ -189,7 +282,7 @@ server.patch(ALUMNOS_ROUTE, async (req, res) => {
   }
 });
 
-server.patch(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
+server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
     const datos = req.body;
@@ -201,31 +294,67 @@ server.patch(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
       ),
     }));
 
-    const alumnoActualizado = await Alumnos.findByIdAndUpdate(id, datos, {
-      new: true,
-    });
+    const alumnoActualizado = await Alumnos.findOneAndUpdate(
+      {
+        _id: id,
+        usuarioId: req.usuarioId,
+        escuelaId: req.escuelaId,
+      },
+      datos,
+      {
+        new: true,
+      },
+    );
+
+    if (!alumnoActualizado) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Alumno no encontrado",
+      });
+    }
 
     const mensaje = "Alumno actualizado con éxito";
 
-    res.status(200).json({ mensaje, alumnoActualizado });
+    res.status(200).json({
+      mensaje,
+      alumnoActualizado,
+    });
   } catch (error) {
     const mensaje = "Error al actualizar alumno";
 
-    res.status(500).json({ mensaje, error });
+    res.status(500).json({
+      mensaje,
+      error,
+    });
   }
 });
 
-server.delete(`${ALUMNOS_ROUTE}/:id`, async (req, res) => {
+server.delete(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
-    const alumnoEliminado = await Alumnos.findByIdAndDelete(id);
+
+    const alumnoEliminado = await Alumnos.findOneAndDelete({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!alumnoEliminado) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Alumno no encontrado",
+      });
+    }
+
     const mensaje = "Alumno eliminado con éxito";
+
     res.status(200).json({
       mensaje,
       alumnoEliminado,
     });
   } catch (error) {
     const mensaje = "Error al eliminar alumno";
+
     res.status(500).json({
       mensaje,
       error,

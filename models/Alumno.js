@@ -33,6 +33,8 @@ const AlumnoSchema = new mongoose.Schema(
         calificaciones: String,
       },
     ],
+    usuarioId: mongoose.Schema.Types.ObjectId,
+    escuelaId: mongoose.Schema.Types.ObjectId,
   },
   {
     collection: "alumnos",
