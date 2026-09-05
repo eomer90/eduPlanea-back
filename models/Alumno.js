@@ -10,6 +10,7 @@ const AlumnoSchema = new mongoose.Schema(
 
     materias: [
       {
+        claseId: mongoose.Schema.Types.ObjectId,
         nombre: String,
 
         asistencias: [

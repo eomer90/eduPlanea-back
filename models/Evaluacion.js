@@ -6,21 +6,16 @@ const EvaluacionSchema = new mongoose.Schema(
     fecha: String,
     materia: String,
     instrumento: String,
-
     cuantitativa: Boolean,
     cualitativa: Boolean,
-
     contenidoId: String,
     pdaIds: [String],
-
     resultados: [
       {
         alumnoId: mongoose.Schema.Types.ObjectId,
-
         calificacion: String,
         nivelDesempeno: String,
         observaciones: String,
-
         manifestaciones: [
           {
             pdaId: String,
@@ -32,6 +27,7 @@ const EvaluacionSchema = new mongoose.Schema(
 
     usuarioId: mongoose.Schema.Types.ObjectId,
     escuelaId: mongoose.Schema.Types.ObjectId,
+    claseId: mongoose.Schema.Types.ObjectId,
   },
   {
     collection: "evaluaciones",

@@ -473,6 +473,8 @@ server.get(ESCUELAS_ROUTE, async (req, res) => {
 
 server.post("/evaluaciones", verificarToken, async (req, res) => {
   try {
+    console.log("BODY:", req.body);
+    console.log("CLASE ID RECIBIDO:", req.body.claseId);
     const data = {
       ...req.body,
       usuarioId: req.usuarioId,
