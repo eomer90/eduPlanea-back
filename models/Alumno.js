@@ -25,14 +25,34 @@ const AlumnoSchema = new mongoose.Schema(
 
         evaluaciones: [
           {
-            tipoEvaluacion: String,
-            resultado: String,
+            nombre: String,
+            fecha: String,
+            instrumento: String,
+            cuantitativa: Boolean,
+            cualitativa: Boolean,
+            contenidoId: String,
+            pdaIds: [String],
+
+            resultados: [
+              {
+                alumnoId: String,
+                calificacion: String,
+                nivelDesempeno: String,
+                observaciones: String,
+
+                manifestaciones: [
+                  {
+                    pdaId: String,
+                    manifestacion: String,
+                  },
+                ],
+              },
+            ],
           },
         ],
-
-        calificaciones: String,
       },
     ],
+
     usuarioId: mongoose.Schema.Types.ObjectId,
     escuelaId: mongoose.Schema.Types.ObjectId,
   },
