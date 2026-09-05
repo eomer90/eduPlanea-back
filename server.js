@@ -223,12 +223,46 @@ server.post(ALUMNOS_ROUTE, verificarToken, async (req, res) => {
       escuelaId: req.escuelaId,
     };
 
+    const alumnoExistente = await Alumnos.findOne({
+      nombre: req.body.nombre,
+      apellidoPaterno: req.body.apellidoPaterno,
+      apellidoMaterno: req.body.apellidoMaterno,
+      escuelaId: req.escuelaId,
+    });
+
+    if (alumnoExistente) {
+      const nuevaMateria = req.body.materias[0];
+
+      const yaTieneClase = alumnoExistente.materias.some(
+        (materia) => materia.claseId.toString() === nuevaMateria.claseId,
+      );
+
+      if (yaTieneClase) {
+        return res.status(200).json({
+          mensaje: "El alumno ya está inscrito en esta clase",
+          alumno: alumnoExistente,
+        });
+      }
+
+      alumnoExistente.materias.push(nuevaMateria);
+
+      await alumnoExistente.save();
+
+      return res.status(200).json({
+        mensaje: "Clase agregada al alumno",
+        alumno: alumnoExistente,
+      });
+    }
+
     const nuevoAlumno = await Alumnos.create(data);
 
-    const mensaje = "Nuevo alumno creado con éxito";
-
-    res.status(201).json({ mensaje, nuevoAlumno });
+    res.status(201).json({
+      mensaje: "Nuevo alumno creado con éxito",
+      nuevoAlumno,
+    });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       error,
       mensaje: "Error al crear nuevo alumno",
