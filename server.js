@@ -18,6 +18,7 @@ const Clases = require("./models/Clase");
 const Alumnos = require("./models/Alumno");
 const Escuela = require("./models/Escuela");
 const Usuario = require("./models/Usuario");
+const Evaluacion = require("./models/Evaluacion");
 
 const levantarServer = async () => {
   try {
@@ -184,54 +185,6 @@ server.get(ALUMNOS_ROUTE, verificarToken, async (req, res) => {
     const mensaje = "Error al encontrar alumnos";
 
     res.status(500).json({ mensaje, error });
-  }
-});
-
-server.patch("/alumnos/evaluacion", verificarToken, async (req, res) => {
-  try {
-    const { materia, evaluacion } = req.body;
-
-    for (const resultado of evaluacion.resultados) {
-      const alumno = await Alumnos.findOne({
-        _id: resultado.alumnoId,
-        usuarioId: req.usuarioId,
-        escuelaId: req.escuelaId,
-      });
-
-      if (!alumno) {
-        continue;
-      }
-
-      const materiaAlumno = alumno.materias.find((m) => m.nombre === materia);
-
-      if (!materiaAlumno) {
-        continue;
-      }
-
-      materiaAlumno.evaluaciones.push({
-        nombre: evaluacion.nombre,
-        fecha: evaluacion.fecha,
-        instrumento: evaluacion.instrumento,
-        cuantitativa: evaluacion.cuantitativa,
-        cualitativa: evaluacion.cualitativa,
-        contenidoId: evaluacion.contenidoId,
-        pdaIds: evaluacion.pdaIds,
-        resultados: [resultado],
-      });
-
-      await alumno.save();
-    }
-
-    res.status(200).json({
-      mensaje: "Evaluación guardada correctamente",
-    });
-  } catch (error) {
-    console.log("ERROR EVALUACION:", error);
-
-    res.status(500).json({
-      error: true,
-      mensaje: "Error al guardar la evaluación",
-    });
   }
 });
 
@@ -513,5 +466,31 @@ server.get(ESCUELAS_ROUTE, async (req, res) => {
   } catch (error) {
     const mensaje = "Error al encontrar escuelas";
     res.status(500).json({ mensaje, error });
+  }
+});
+
+// evaluaciones
+
+server.post("/evaluaciones", verificarToken, async (req, res) => {
+  try {
+    const data = {
+      ...req.body,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    };
+
+    const nuevaEvaluacion = await Evaluacion.create(data);
+
+    res.status(201).json({
+      mensaje: "Evaluación guardada correctamente",
+      nuevaEvaluacion,
+    });
+  } catch (error) {
+    console.log("ERROR EVALUACION:", error);
+
+    res.status(500).json({
+      error: true,
+      mensaje: "Error al guardar la evaluación",
+    });
   }
 });
