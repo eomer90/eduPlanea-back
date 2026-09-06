@@ -14,6 +14,7 @@ const PORT = process.env.PORT || 3000;
 const CLASES_ROUTE = "/clases";
 const ALUMNOS_ROUTE = "/alumnos";
 const ESCUELAS_ROUTE = "/escuelas";
+const EVALUACIONES_ROUTE = "/evaluaciones";
 const Clases = require("./models/Clase");
 const Alumnos = require("./models/Alumno");
 const Escuela = require("./models/Escuela");
@@ -505,10 +506,19 @@ server.get(ESCUELAS_ROUTE, async (req, res) => {
 
 // evaluaciones
 
-server.post("/evaluaciones", verificarToken, async (req, res) => {
+server.get(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
   try {
-    console.log("BODY:", req.body);
-    console.log("CLASE ID RECIBIDO:", req.body.claseId);
+    const evaluacionesEncontradas = await Evaluacion.find();
+    const mensaje = "Evaluaciones encontradas con éxito";
+    res.status(200).json({ mensaje, evaluacionesEncontradas });
+  } catch (error) {
+    const mensaje = "Error al encontrar evaluaciones";
+    res.status(500).json({ mensaje, error });
+  }
+});
+
+server.post(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
+  try {
     const data = {
       ...req.body,
       usuarioId: req.usuarioId,
