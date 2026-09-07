@@ -524,19 +524,50 @@ server.post(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
       usuarioId: req.usuarioId,
       escuelaId: req.escuelaId,
     };
-
     const nuevaEvaluacion = await Evaluacion.create(data);
-
     res.status(201).json({
       mensaje: "Evaluación guardada correctamente",
       nuevaEvaluacion,
     });
   } catch (error) {
-    console.log("ERROR EVALUACION:", error);
-
     res.status(500).json({
       error: true,
       mensaje: "Error al guardar la evaluación",
+    });
+  }
+});
+
+server.patch(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
+  try {
+    const { _id, ...data } = req.body;
+
+    const evaluacionActualizada = await Evaluacion.findByIdAndUpdate(
+      _id,
+      data,
+      {
+        new: true,
+      },
+    );
+    const mensaje = "Evaluacion actualiazada con éxito";
+    res.status(200).json({ mensaje, evaluacionActualizada });
+  } catch (error) {
+    res.status(500).json({
+      error: true,
+      mensaje: "Error al Actualizar la evaluación",
+    });
+  }
+});
+
+server.delete(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
+  try {
+    const id = req.body._id;
+    const evaluacionEliminada = await Evaluacion.findByIdAndDelete(id);
+    const mensaje = "Evaluación eliminada con éxito";
+    res.status(200).json({ mensaje, evaluacionEliminada });
+  } catch (error) {
+    res.status(500).json({
+      error: true,
+      mensaje: "Error al eliminar la evaluación",
     });
   }
 });
