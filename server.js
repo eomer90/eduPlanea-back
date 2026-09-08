@@ -366,6 +366,9 @@ server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
     const id = req.params.id;
     const datos = req.body;
 
+    console.log("DATOS RECIBIDOS:", datos);
+    console.log("NOMBRE RECIBIDO:", datos.nombre);
+
     datos.materias = datos.materias.map((materia) => ({
       ...materia,
       asistencias: materia.asistencias.filter(
