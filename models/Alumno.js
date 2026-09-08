@@ -26,6 +26,18 @@ const AlumnoSchema = new mongoose.Schema(
       },
     ],
 
+    actividades: [
+      {
+        titulo: String,
+        fecha: String,
+        estado: {
+          type: String,
+          enum: ["Pendiente", "Entregado", "No entregado", "Entregado tarde"],
+        },
+        observaciones: String,
+      },
+    ],
+
     usuarioId: mongoose.Schema.Types.ObjectId,
     escuelaId: mongoose.Schema.Types.ObjectId,
   },
