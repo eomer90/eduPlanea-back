@@ -319,50 +319,9 @@ server.patch(ALUMNOS_ROUTE, verificarToken, async (req, res) => {
   }
 });
 
-server.patch("/alumnos/:id", verificarToken, async (req, res) => {
-  try {
-    const { actividades } = req.body;
-
-    const alumnoActualizado = await Alumnos.findOneAndUpdate(
-      {
-        _id: req.params.id,
-        usuarioId: req.usuarioId,
-        escuelaId: req.escuelaId,
-      },
-      {
-        $set: {
-          actividades: actividades,
-        },
-      },
-      {
-        new: true,
-      },
-    );
-
-    if (!alumnoActualizado) {
-      return res.status(404).json({
-        error: true,
-        mensaje: "Alumno no encontrado",
-      });
-    }
-
-    res.status(200).json({
-      error: false,
-      mensaje: "Actividades actualizadas correctamente",
-      alumno: alumnoActualizado,
-    });
-  } catch (error) {
-    console.log("ERROR ACTUALIZAR ACTIVIDADES:", error);
-
-    res.status(500).json({
-      error: true,
-      mensaje: "Error al actualizar las actividades",
-    });
-  }
-});
-
 server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
   console.log("🔥 PATCH ALUMNO EJECUTADO");
+
   try {
     const id = req.params.id;
     const datos = req.body;
@@ -389,7 +348,8 @@ server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
         $set: datos,
       },
       {
-        new: true,
+        returnDocument: "after",
+        runValidators: true,
       },
     );
 
