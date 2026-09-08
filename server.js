@@ -366,15 +366,17 @@ server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
     const id = req.params.id;
     const datos = req.body;
 
-    console.log("DATOS RECIBIDOS:", datos);
+    console.log("ID:", id);
     console.log("NOMBRE RECIBIDO:", datos.nombre);
 
-    datos.materias = datos.materias.map((materia) => ({
-      ...materia,
-      asistencias: materia.asistencias.filter(
-        (asistencia) => asistencia.fecha !== "",
-      ),
-    }));
+    if (datos.materias) {
+      datos.materias = datos.materias.map((materia) => ({
+        ...materia,
+        asistencias: (materia.asistencias || []).filter(
+          (asistencia) => asistencia.fecha !== "",
+        ),
+      }));
+    }
 
     const alumnoActualizado = await Alumnos.findOneAndUpdate(
       {
@@ -382,11 +384,15 @@ server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
         usuarioId: req.usuarioId,
         escuelaId: req.escuelaId,
       },
-      datos,
+      {
+        $set: datos,
+      },
       {
         new: true,
       },
     );
+
+    console.log("NOMBRE DESPUÉS DE ACTUALIZAR:", alumnoActualizado?.nombre);
 
     if (!alumnoActualizado) {
       return res.status(404).json({
@@ -395,17 +401,15 @@ server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
       });
     }
 
-    const mensaje = "Alumno actualizado con éxito";
-
     res.status(200).json({
-      mensaje,
+      mensaje: "Alumno actualizado con éxito",
       alumnoActualizado,
     });
   } catch (error) {
-    const mensaje = "Error al actualizar alumno";
+    console.log("ERROR:", error);
 
     res.status(500).json({
-      mensaje,
+      mensaje: "Error al actualizar alumno",
       error,
     });
   }
