@@ -362,6 +362,7 @@ server.patch("/alumnos/:id", verificarToken, async (req, res) => {
 });
 
 server.patch(`${ALUMNOS_ROUTE}/:id`, verificarToken, async (req, res) => {
+  console.log("🔥 PATCH ALUMNO EJECUTADO");
   try {
     const id = req.params.id;
     const datos = req.body;
