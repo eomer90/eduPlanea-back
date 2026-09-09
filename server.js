@@ -15,11 +15,13 @@ const CLASES_ROUTE = "/clases";
 const ALUMNOS_ROUTE = "/alumnos";
 const ESCUELAS_ROUTE = "/escuelas";
 const EVALUACIONES_ROUTE = "/evaluaciones";
+const RECORDATORIOS_ROUTE = "/recordatorios";
 const Clases = require("./models/Clase");
 const Alumnos = require("./models/Alumno");
 const Escuela = require("./models/Escuela");
 const Usuario = require("./models/Usuario");
 const Evaluacion = require("./models/Evaluacion");
+const Recordatorio = require("./models/Recordatorio");
 
 const levantarServer = async () => {
   try {
@@ -578,6 +580,56 @@ server.delete(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
     res.status(500).json({
       error: true,
       mensaje: "Error al eliminar la evaluación",
+    });
+  }
+});
+
+//recordatorios
+
+server.get(RECORDATORIOS_ROUTE, verificarToken, async (req, res) => {
+  try {
+    const recordatoriosEncontrados = await Recordatorio.find({
+      usuarioId: req.usuarioId,
+    });
+
+    const mensaje = "Recordatorios encontrados con éxito";
+
+    res.status(200).json({
+      mensaje,
+      recordatoriosEncontrados,
+    });
+  } catch (error) {
+    const mensaje = "Error al encontrar recordatorios";
+
+    res.status(500).json({
+      error,
+      mensaje,
+    });
+  }
+});
+
+server.post(RECORDATORIOS_ROUTE, verificarToken, async (req, res) => {
+  try {
+    const data = {
+      ...req.body,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    };
+
+    const recordatorioGuardado = await Recordatorio.create(data);
+
+    const mensaje = "Recordatorio guardado con éxito";
+
+    res.status(201).json({
+      mensaje,
+      recordatorioGuardado,
+    });
+  } catch (error) {
+    const mensaje = "Error al guardar el recordatorio";
+
+    res.status(500).json({
+      error,
+      mensaje,
     });
   }
 });
