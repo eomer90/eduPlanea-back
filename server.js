@@ -633,3 +633,63 @@ server.post(RECORDATORIOS_ROUTE, verificarToken, async (req, res) => {
     });
   }
 });
+
+server.patch(`${RECORDATORIOS_ROUTE}/:id`, verificarToken, async (req, res) => {
+  try {
+    const recordatorioActualizado = await Recordatorio.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        usuarioId: req.usuarioId,
+        escuelaId: req.escuelaId,
+      },
+      req.body,
+      { new: true },
+    );
+
+    if (!recordatorioActualizado) {
+      return res.status(404).json({
+        mensaje: "Recordatorio no encontrado",
+      });
+    }
+
+    res.status(200).json({
+      mensaje: "Recordatorio actualizado con éxito",
+      recordatorioActualizado,
+    });
+  } catch (error) {
+    res.status(500).json({
+      mensaje: "Error al actualizar el recordatorio",
+      error,
+    });
+  }
+});
+
+server.delete(
+  `${RECORDATORIOS_ROUTE}/:id`,
+  verificarToken,
+  async (req, res) => {
+    try {
+      const recordatorioEliminado = await Recordatorio.findOneAndDelete({
+        _id: req.params.id,
+        usuarioId: req.usuarioId,
+        escuelaId: req.escuelaId,
+      });
+
+      if (!recordatorioEliminado) {
+        return res.status(404).json({
+          mensaje: "Recordatorio no encontrado",
+        });
+      }
+
+      res.status(200).json({
+        mensaje: "Recordatorio eliminado con éxito",
+        recordatorioEliminado,
+      });
+    } catch (error) {
+      res.status(500).json({
+        mensaje: "Error al eliminar el recordatorio",
+        error,
+      });
+    }
+  },
+);
