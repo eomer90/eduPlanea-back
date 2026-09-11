@@ -455,6 +455,12 @@ server.post("/registro", async (req, res) => {
 
 //login
 
+server.get("/auth/verify", verificarToken, (req, res) => {
+  res.status(200).json({
+    mensaje: "Token válido",
+  });
+});
+
 server.post("/login", async (req, res) => {
   try {
     const { username, password } = req.body;
