@@ -14,7 +14,7 @@ router.get("/auth/verify", verificarToken, (req, res) => {
   });
 });
 
-router.post("/login", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const { username, password } = req.body;
     const usuario = await Usuario.findOne({ username });
