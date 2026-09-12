@@ -20,6 +20,7 @@ const evaluacionesRoutes = require("./routes/evaluaciones");
 const loginRoutes = require("./routes/login");
 const registroRoutes = require("./routes/registros");
 const escuelasRoutes = require("./routes/escuelas");
+const usuariosRoutes = require("./routes/usuarios");
 
 server.use("/clases", clasesRoutes);
 server.use("/alumnos", alumnosRoutes);
@@ -27,6 +28,7 @@ server.use("/evaluaciones", evaluacionesRoutes);
 server.use("/login", loginRoutes);
 server.use("/registro", registroRoutes);
 server.use("/escuelas", escuelasRoutes);
+server.use("/usuarios", usuariosRoutes);
 
 server.get("/auth/verify", verificarToken, (req, res) => {
   res.status(200).json({
