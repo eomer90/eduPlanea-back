@@ -1,5 +1,5 @@
 const express = require("express");
-const Usuario = require("./models/Usuario");
+const Usuario = require("../models/Usuario");
 const verificarToken = require("../middleware/auth");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
