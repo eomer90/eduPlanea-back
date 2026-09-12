@@ -113,48 +113,4 @@ router.delete("/:id", verificarToken, async (req, res) => {
   }
 });
 
-router.patch("/change-password", verificarToken, async (req, res) => {
-  try {
-    const { passwordActual, passwordNueva } = req.body;
-
-    const usuario = await Usuario.findById(req.usuarioId);
-
-    if (!usuario) {
-      return res.status(404).json({
-        error: true,
-        mensaje: "Usuario no encontrado.",
-      });
-    }
-
-    const passwordCorrecta = await bcrypt.compare(
-      passwordActual,
-      usuario.password,
-    );
-
-    if (!passwordCorrecta) {
-      return res.status(401).json({
-        error: true,
-        mensaje: "La contraseña actual es incorrecta.",
-      });
-    }
-
-    const passwordHash = await bcrypt.hash(passwordNueva, 10);
-
-    usuario.password = passwordHash;
-
-    await usuario.save();
-
-    res.status(200).json({
-      mensaje: "Contraseña cambiada correctamente.",
-    });
-  } catch (error) {
-    console.log("ERROR CAMBIAR CONTRASEÑA:", error);
-
-    res.status(500).json({
-      error: true,
-      mensaje: "Error al cambiar la contraseña.",
-    });
-  }
-});
-
 module.exports = router;
