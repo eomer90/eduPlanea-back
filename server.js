@@ -28,6 +28,12 @@ server.use("/alumnos", alumnosRoutes);
 server.use("/evaluaciones", evaluacionesRoutes);
 server.use("/login", loginRoutes);
 
+server.get("/auth/verify", verificarToken, (req, res) => {
+  res.status(200).json({
+    mensaje: "Token válido",
+  });
+});
+
 const levantarServer = async () => {
   try {
     await mongoose.connect(process.env.MONGO_URI);

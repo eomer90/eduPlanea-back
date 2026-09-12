@@ -8,12 +8,6 @@ const enviarCorreoRecuperacion = require("../services/email");
 
 const router = express.Router();
 
-router.get("/auth/verify", verificarToken, (req, res) => {
-  res.status(200).json({
-    mensaje: "Token válido",
-  });
-});
-
 router.post("/", async (req, res) => {
   try {
     const { username, password } = req.body;
