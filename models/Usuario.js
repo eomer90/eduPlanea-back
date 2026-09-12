@@ -8,6 +8,16 @@ const usuarioSchema = new mongoose.Schema(
     password: String,
     admin: Boolean,
     escuelaId: mongoose.Schema.Types.ObjectId,
+
+    resetPasswordToken: {
+      type: String,
+      default: null,
+    },
+
+    resetPasswordExpires: {
+      type: Date,
+      default: null,
+    },
   },
   { collection: "usuarios" },
 );
