@@ -28,6 +28,7 @@ const AlumnoSchema = new mongoose.Schema(
 
     actividades: [
       {
+        claseId: mongoose.Schema.Types.ObjectId,
         titulo: String,
         fecha: String,
         estado: {
