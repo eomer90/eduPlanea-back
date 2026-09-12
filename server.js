@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-const bcrypt = require("bcrypt");
 
 const verificarToken = require("./middleware/auth");
 
@@ -12,21 +11,22 @@ server.use(cors());
 
 const PORT = process.env.PORT || 3000;
 
-const ESCUELAS_ROUTE = "/escuelas";
 const RECORDATORIOS_ROUTE = "/recordatorios";
-const Escuela = require("./models/Escuela");
-const Usuario = require("./models/Usuario");
 const Recordatorio = require("./models/Recordatorio");
 
 const clasesRoutes = require("./routes/clases");
 const alumnosRoutes = require("./routes/alumnos");
 const evaluacionesRoutes = require("./routes/evaluaciones");
 const loginRoutes = require("./routes/login");
+const registroRoutes = require("./routes/registros");
+const escuelasRoutes = require("./routes/escuelas");
 
 server.use("/clases", clasesRoutes);
 server.use("/alumnos", alumnosRoutes);
 server.use("/evaluaciones", evaluacionesRoutes);
 server.use("/login", loginRoutes);
+server.use("/registro", registroRoutes);
+server.use("/escuelas", escuelasRoutes);
 
 server.get("/auth/verify", verificarToken, (req, res) => {
   res.status(200).json({
@@ -49,61 +49,6 @@ const levantarServer = async () => {
 };
 
 levantarServer();
-
-//registro
-
-server.post("/registro", async (req, res) => {
-  try {
-    const {
-      nombreEscuela,
-      nivelEducativo,
-      nombreUsuario,
-      correo,
-      username,
-      password,
-    } = req.body;
-
-    const nuevaEscuela = await Escuela.create({
-      nombre: nombreEscuela,
-      nivelEducativo,
-    });
-
-    const passwordHash = await bcrypt.hash(password, 10);
-
-    const nuevoUsuario = await Usuario.create({
-      nombre: nombreUsuario,
-      correo,
-      username,
-      password: passwordHash,
-      admin: true,
-      escuelaId: nuevaEscuela._id,
-    });
-
-    res.status(201).json({
-      mensaje: "Registro realizado con éxito",
-      escuela: nuevaEscuela,
-      usuario: nuevoUsuario,
-    });
-  } catch (error) {
-    res.status(500).json({
-      error,
-      mensaje: "Error al realizar el registro",
-    });
-  }
-});
-
-//escuelas
-
-server.get(ESCUELAS_ROUTE, async (req, res) => {
-  try {
-    const escuelasEncontradas = await Escuela.find();
-    const mensaje = "Escuelas encontradas con éxito";
-    res.status(200).json({ mensaje, escuelasEncontradas });
-  } catch (error) {
-    const mensaje = "Error al encontrar escuelas";
-    res.status(500).json({ mensaje, error });
-  }
-});
 
 //recordatorios
 
