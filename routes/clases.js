@@ -2,11 +2,9 @@ const express = require("express");
 const Clases = require("../models/Clase");
 const verificarToken = require("../middleware/auth");
 
-const CLASES_ROUTE = "/clases";
-
 const router = express.Router();
 
-router.get(CLASES_ROUTE, verificarToken, async (req, res) => {
+router.get("/", verificarToken, async (req, res) => {
   try {
     const clases = await Clases.find({
       usuarioId: req.usuarioId,
@@ -20,7 +18,7 @@ router.get(CLASES_ROUTE, verificarToken, async (req, res) => {
   }
 });
 
-router.get(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
+router.get("/:id", verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
     const claseEncontrada = await Clases.findOne({
@@ -42,7 +40,7 @@ router.get(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
   }
 });
 
-router.post(CLASES_ROUTE, verificarToken, async (req, res) => {
+router.post("/", verificarToken, async (req, res) => {
   try {
     const data = {
       ...req.body,
@@ -58,7 +56,7 @@ router.post(CLASES_ROUTE, verificarToken, async (req, res) => {
   }
 });
 
-router.patch(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
+router.patch("/:id", verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
     const data = req.body;
@@ -87,7 +85,7 @@ router.patch(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
   }
 });
 
-router.delete(`${CLASES_ROUTE}/:id`, verificarToken, async (req, res) => {
+router.delete("/:id", verificarToken, async (req, res) => {
   try {
     const id = req.params.id;
     const claseEliminada = await Clases.findOneAndDelete({
