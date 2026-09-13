@@ -9,7 +9,10 @@ const EvaluacionSchema = new mongoose.Schema(
     cuantitativa: Boolean,
     cualitativa: Boolean,
     contenidoId: String,
-    observacionesGenerales: string,
+    observacionesGenerales: {
+      type: String,
+      default: "",
+    },
     pdaIds: [String],
     resultados: [
       {
