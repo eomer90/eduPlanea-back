@@ -1,5 +1,6 @@
 const express = require("express");
 const Recordatorio = require("../models/Recordatorio");
+const verificarToken = require("../middleware/auth");
 
 const router = express.Router();
 
