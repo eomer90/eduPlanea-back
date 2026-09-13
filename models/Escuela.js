@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const escuelaSchema = new mongoose.Schema(
   {
-    nombre: String,
+    nombreEscuela: String,
     nivelEducativo: String,
   },
   { collection: "escuelas" },
