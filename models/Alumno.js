@@ -31,7 +31,7 @@ const AlumnoSchema = new mongoose.Schema(
         fecha: String,
         estado: {
           type: String,
-          enum: ["Pendiente", "Entregado", "No entregado", "Entregado tarde"],
+          enum: ["Pendiente", "Entregado", "No entregado"],
         },
         observaciones: String,
       },
