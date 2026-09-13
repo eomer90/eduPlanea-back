@@ -165,7 +165,7 @@ router.patch("/", verificarToken, async (req, res) => {
 
     for (const alumno of asistencia) {
       const alumnoEncontrado = await Alumnos.findOne({
-        _id: alumno.id,
+        _id: alumno.alumnoId,
         usuarioId: req.usuarioId,
         escuelaId: req.escuelaId,
       });
@@ -224,6 +224,13 @@ router.patch("/asistencias/fecha", verificarToken, async (req, res) => {
       });
     }
 
+    if (fechaAnterior === fechaNueva) {
+      return res.status(400).json({
+        error: true,
+        mensaje: "La fecha nueva debe ser diferente",
+      });
+    }
+
     const alumnos = await Alumnos.find({
       usuarioId: req.usuarioId,
       escuelaId: req.escuelaId,
@@ -239,27 +246,35 @@ router.patch("/asistencias/fecha", verificarToken, async (req, res) => {
 
       if (!materia) continue;
 
-      const asistencia = materia.asistencias.find(
+      const asistenciaExistente = materia.asistencias.find(
         (asistencia) => asistencia.fecha === fechaAnterior,
       );
 
-      if (!asistencia) continue;
+      if (!asistenciaExistente) continue;
 
-      asistencia.fecha = fechaNueva;
+      const fechaDuplicada = materia.asistencias.some(
+        (asistencia) => asistencia.fecha === fechaNueva,
+      );
+
+      if (fechaDuplicada) {
+        continue;
+      }
+
+      asistenciaExistente.fecha = fechaNueva;
 
       await alumno.save();
 
       actualizadas++;
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       mensaje: "Fecha de asistencia actualizada con éxito",
       actualizadas,
     });
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       mensaje: "Error al actualizar fecha de asistencia",
       detalle: error.message,
@@ -360,19 +375,18 @@ router.delete("/asistencias", verificarToken, async (req, res) => {
 
       if (materia.asistencias.length !== asistenciasAntes) {
         await alumno.save();
-
         eliminadas++;
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       mensaje: "Asistencia eliminada con éxito",
       eliminadas,
     });
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       mensaje: "Error al eliminar asistencia",
       detalle: error.message,
