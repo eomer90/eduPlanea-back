@@ -7,12 +7,11 @@ const AlumnoSchema = new mongoose.Schema(
     apellidoMaterno: String,
     grado: String,
     grupo: String,
-
+    observacionesGenerales: String,
     materias: [
       {
         claseId: mongoose.Schema.Types.ObjectId,
         nombre: String,
-
         asistencias: [
           {
             fecha: String,
@@ -25,7 +24,6 @@ const AlumnoSchema = new mongoose.Schema(
         ],
       },
     ],
-
     actividades: [
       {
         claseId: mongoose.Schema.Types.ObjectId,
@@ -38,7 +36,6 @@ const AlumnoSchema = new mongoose.Schema(
         observaciones: String,
       },
     ],
-
     usuarioId: mongoose.Schema.Types.ObjectId,
     escuelaId: mongoose.Schema.Types.ObjectId,
   },
