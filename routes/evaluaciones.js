@@ -47,19 +47,37 @@ router.patch("/", verificarToken, async (req, res) => {
   try {
     const { _id, ...data } = req.body;
 
-    const evaluacionActualizada = await Evaluaciones.findByIdAndUpdate(
-      _id,
+    const evaluacionActualizada = await Evaluaciones.findOneAndUpdate(
+      {
+        _id,
+        usuarioId: req.usuarioId,
+        escuelaId: req.escuelaId,
+      },
       data,
       {
         new: true,
       },
     );
-    const mensaje = "Evaluacion actualiazada con éxito";
-    res.status(200).json({ mensaje, evaluacionActualizada });
+
+    if (!evaluacionActualizada) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Evaluación no encontrada",
+      });
+    }
+
+    const mensaje = "Evaluación actualizada con éxito";
+
+    res.status(200).json({
+      mensaje,
+      evaluacionActualizada,
+    });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       error: true,
-      mensaje: "Error al Actualizar la evaluación",
+      mensaje: "Error al actualizar la evaluación",
     });
   }
 });
@@ -67,15 +85,33 @@ router.patch("/", verificarToken, async (req, res) => {
 router.delete("/", verificarToken, async (req, res) => {
   try {
     const id = req.body._id;
-    const evaluacionEliminada = await Evaluaciones.findByIdAndDelete(id);
+
+    const evaluacionEliminada = await Evaluaciones.findOneAndDelete({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!evaluacionEliminada) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Evaluación no encontrada",
+      });
+    }
+
     const mensaje = "Evaluación eliminada con éxito";
-    res.status(200).json({ mensaje, evaluacionEliminada });
+
+    res.status(200).json({
+      mensaje,
+      evaluacionEliminada,
+    });
   } catch (error) {
+    console.log(error);
+
     res.status(500).json({
       error: true,
       mensaje: "Error al eliminar la evaluación",
     });
   }
 });
-
 module.exports = router;
