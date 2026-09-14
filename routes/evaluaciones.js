@@ -2,8 +2,6 @@ const express = require("express");
 const Evaluaciones = require("../models/Evaluacion");
 const verificarToken = require("../middleware/auth");
 
-const EVALUACIONES_ROUTE = "/evaluaciones";
-
 const router = express.Router();
 
 router.get("/clase/:claseId", verificarToken, async (req, res) => {
@@ -25,7 +23,7 @@ router.get("/clase/:claseId", verificarToken, async (req, res) => {
   }
 });
 
-router.post(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
+router.post("/", verificarToken, async (req, res) => {
   try {
     const data = {
       ...req.body,
@@ -45,7 +43,7 @@ router.post(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
   }
 });
 
-router.patch(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
+router.patch("/", verificarToken, async (req, res) => {
   try {
     const { _id, ...data } = req.body;
 
@@ -66,7 +64,7 @@ router.patch(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
   }
 });
 
-router.delete(EVALUACIONES_ROUTE, verificarToken, async (req, res) => {
+router.delete("/", verificarToken, async (req, res) => {
   try {
     const id = req.body._id;
     const evaluacionEliminada = await Evaluaciones.findByIdAndDelete(id);
