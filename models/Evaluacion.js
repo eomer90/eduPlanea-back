@@ -9,17 +9,27 @@ const EvaluacionSchema = new mongoose.Schema(
     cuantitativa: Boolean,
     cualitativa: Boolean,
     contenidoId: String,
+
     observacionesGenerales: {
       type: String,
       default: "",
     },
+
     pdaIds: [String],
+
     resultados: [
       {
         alumnoId: mongoose.Schema.Types.ObjectId,
+
+        realizoEvaluacion: {
+          type: Boolean,
+          required: true,
+        },
+
         calificacion: String,
         nivelDesempeno: String,
         observaciones: String,
+
         manifestaciones: [
           {
             pdaId: String,

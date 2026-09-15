@@ -291,6 +291,19 @@ router.patch("/actividades", verificarToken, async (req, res) => {
     const { claseId, tituloAnterior, fechaAnterior, tituloNuevo, fechaNueva } =
       req.body;
 
+    if (
+      !claseId ||
+      !tituloAnterior ||
+      !fechaAnterior ||
+      !tituloNuevo ||
+      !fechaNueva
+    ) {
+      return res.status(400).json({
+        error: true,
+        mensaje: "Faltan datos para actualizar la actividad",
+      });
+    }
+
     const alumnos = await Alumnos.find({
       usuarioId: req.usuarioId,
       escuelaId: req.escuelaId,
@@ -306,6 +319,7 @@ router.patch("/actividades", verificarToken, async (req, res) => {
 
       for (const actividad of actividades) {
         if (
+          String(actividad.claseId) === String(claseId) &&
           actividad.titulo === tituloAnterior &&
           actividad.fecha === fechaAnterior
         ) {
@@ -322,14 +336,14 @@ router.patch("/actividades", verificarToken, async (req, res) => {
       }
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       mensaje: "Actividad actualizada con éxito",
       actualizadas,
     });
   } catch (error) {
     console.log(error);
 
-    res.status(500).json({
+    return res.status(500).json({
       error: true,
       mensaje: "Error al actualizar actividad",
       detalle: error.message,
@@ -402,123 +416,6 @@ router.delete("/actividades", verificarToken, async (req, res) => {
   try {
     const { claseId, titulo, fecha } = req.body;
 
-    const alumnos = await Alumnos.find({
-      usuarioId: req.usuarioId,
-      escuelaId: req.escuelaId,
-      "materias.claseId": claseId,
-    });
-
-    let eliminadas = 0;
-
-    for (const alumno of alumnos) {
-      const actividades = alumno.actividades || [];
-
-      const actividadesAntes = actividades.length;
-
-      alumno.actividades = actividades.filter(
-        (actividad) =>
-          !(actividad.titulo === titulo && actividad.fecha === fecha),
-      );
-
-      if (alumno.actividades.length !== actividadesAntes) {
-        await alumno.save();
-
-        eliminadas++;
-      }
-    }
-
-    res.status(200).json({
-      mensaje: "Actividad eliminada con éxito",
-      eliminadas,
-    });
-  } catch (error) {
-    console.log(error);
-
-    res.status(500).json({
-      error: true,
-      mensaje: "Error al eliminar actividad",
-      detalle: error.message,
-    });
-  }
-});
-
-// ==========================================
-// ACTUALIZAR ALUMNO
-// ==========================================
-
-router.patch("/actividades", verificarToken, async (req, res) => {
-  try {
-    const { claseId, tituloAnterior, fechaAnterior, tituloNuevo, fechaNueva } =
-      req.body;
-
-    if (
-      !claseId ||
-      !tituloAnterior ||
-      !fechaAnterior ||
-      !tituloNuevo ||
-      !fechaNueva
-    ) {
-      return res.status(400).json({
-        error: true,
-        mensaje: "Faltan datos para actualizar la actividad",
-      });
-    }
-
-    const alumnos = await Alumnos.find({
-      usuarioId: req.usuarioId,
-      escuelaId: req.escuelaId,
-      "materias.claseId": claseId,
-    });
-
-    let actualizadas = 0;
-
-    for (const alumno of alumnos) {
-      const actividades = alumno.actividades || [];
-
-      let modificada = false;
-
-      for (const actividad of actividades) {
-        if (
-          String(actividad.claseId) === String(claseId) &&
-          actividad.titulo === tituloAnterior &&
-          actividad.fecha === fechaAnterior
-        ) {
-          actividad.titulo = tituloNuevo;
-          actividad.fecha = fechaNueva;
-
-          modificada = true;
-        }
-      }
-
-      if (modificada) {
-        await alumno.save();
-        actualizadas++;
-      }
-    }
-
-    return res.status(200).json({
-      mensaje: "Actividad actualizada con éxito",
-      actualizadas,
-    });
-  } catch (error) {
-    console.log(error);
-
-    return res.status(500).json({
-      error: true,
-      mensaje: "Error al actualizar actividad",
-      detalle: error.message,
-    });
-  }
-});
-
-// ==========================================
-// ELIMINAR ALUMNO
-// ==========================================
-
-router.delete("/actividades", verificarToken, async (req, res) => {
-  try {
-    const { claseId, titulo, fecha } = req.body;
-
     if (!claseId || !titulo || !fecha) {
       return res.status(400).json({
         error: true,
@@ -564,6 +461,42 @@ router.delete("/actividades", verificarToken, async (req, res) => {
     return res.status(500).json({
       error: true,
       mensaje: "Error al eliminar actividad",
+      detalle: error.message,
+    });
+  }
+});
+
+// ==========================================
+// ELIMINAR ALUMNO
+// ==========================================
+
+router.delete("/:id", verificarToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const alumnoEliminado = await Alumnos.findOneAndDelete({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!alumnoEliminado) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Alumno no encontrado",
+      });
+    }
+
+    return res.status(200).json({
+      mensaje: "Alumno eliminado con éxito",
+      alumnoEliminado,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      error: true,
+      mensaje: "Error al eliminar alumno",
       detalle: error.message,
     });
   }
