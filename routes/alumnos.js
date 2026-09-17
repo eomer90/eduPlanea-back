@@ -209,6 +209,49 @@ router.patch("/", verificarToken, async (req, res) => {
   }
 });
 
+router.patch("/:id", verificarToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const alumnoEncontrado = await Alumnos.findOne({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!alumnoEncontrado) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Alumno no encontrado",
+      });
+    }
+
+    alumnoEncontrado.nombre = req.body.nombre;
+    alumnoEncontrado.apellidoPaterno = req.body.apellidoPaterno;
+    alumnoEncontrado.apellidoMaterno = req.body.apellidoMaterno;
+    alumnoEncontrado.grado = req.body.grado;
+    alumnoEncontrado.grupo = req.body.grupo;
+    alumnoEncontrado.observacionesGenerales = req.body.observacionesGenerales;
+    alumnoEncontrado.materias = req.body.materias;
+    alumnoEncontrado.actividades = req.body.actividades || [];
+
+    await alumnoEncontrado.save();
+
+    return res.status(200).json({
+      mensaje: "Alumno actualizado con éxito",
+      alumnoEncontrado,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      error: true,
+      mensaje: "Error al actualizar alumno",
+      detalle: error.message,
+    });
+  }
+});
+
 // ==========================================
 // EDITAR FECHA DE ASISTENCIA
 // ==========================================
