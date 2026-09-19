@@ -300,7 +300,6 @@ router.patch("/asistencias/fecha", verificarToken, async (req, res) => {
     const alumnos = await Alumnos.find({
       usuarioId: req.usuarioId,
       escuelaId: req.escuelaId,
-      "materias.claseId": claseId,
     });
 
     let actualizadas = 0;
