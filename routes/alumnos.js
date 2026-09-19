@@ -209,72 +209,6 @@ router.patch("/", verificarToken, async (req, res) => {
   }
 });
 
-router.patch("/:id", verificarToken, async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const alumnoEncontrado = await Alumnos.findOne({
-      _id: id,
-      usuarioId: req.usuarioId,
-      escuelaId: req.escuelaId,
-    });
-
-    if (!alumnoEncontrado) {
-      return res.status(404).json({
-        error: true,
-        mensaje: "Alumno no encontrado",
-      });
-    }
-
-    if (req.body.nombre !== undefined) {
-      alumnoEncontrado.nombre = req.body.nombre;
-    }
-
-    if (req.body.apellidoPaterno !== undefined) {
-      alumnoEncontrado.apellidoPaterno = req.body.apellidoPaterno;
-    }
-
-    if (req.body.apellidoMaterno !== undefined) {
-      alumnoEncontrado.apellidoMaterno = req.body.apellidoMaterno;
-    }
-
-    if (req.body.grado !== undefined) {
-      alumnoEncontrado.grado = req.body.grado;
-    }
-
-    if (req.body.grupo !== undefined) {
-      alumnoEncontrado.grupo = req.body.grupo;
-    }
-
-    if (req.body.observacionesGenerales !== undefined) {
-      alumnoEncontrado.observacionesGenerales = req.body.observacionesGenerales;
-    }
-
-    if (req.body.materias !== undefined) {
-      alumnoEncontrado.materias = req.body.materias;
-    }
-
-    if (req.body.actividades !== undefined) {
-      alumnoEncontrado.actividades = req.body.actividades;
-    }
-
-    await alumnoEncontrado.save();
-
-    return res.status(200).json({
-      mensaje: "Alumno actualizado con éxito",
-      alumnoEncontrado,
-    });
-  } catch (error) {
-    console.log(error);
-
-    return res.status(500).json({
-      error: true,
-      mensaje: "Error al actualizar alumno",
-      detalle: error.message,
-    });
-  }
-});
-
 // ==========================================
 // EDITAR FECHA DE ASISTENCIA
 // ==========================================
@@ -372,7 +306,6 @@ router.patch("/actividades", verificarToken, async (req, res) => {
     const alumnos = await Alumnos.find({
       usuarioId: req.usuarioId,
       escuelaId: req.escuelaId,
-      "materias.claseId": claseId,
     });
 
     let actualizadas = 0;
@@ -416,6 +349,73 @@ router.patch("/actividades", verificarToken, async (req, res) => {
   }
 });
 
+//editar alumno
+router.patch("/:id", verificarToken, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const alumnoEncontrado = await Alumnos.findOne({
+      _id: id,
+      usuarioId: req.usuarioId,
+      escuelaId: req.escuelaId,
+    });
+
+    if (!alumnoEncontrado) {
+      return res.status(404).json({
+        error: true,
+        mensaje: "Alumno no encontrado",
+      });
+    }
+
+    if (req.body.nombre !== undefined) {
+      alumnoEncontrado.nombre = req.body.nombre;
+    }
+
+    if (req.body.apellidoPaterno !== undefined) {
+      alumnoEncontrado.apellidoPaterno = req.body.apellidoPaterno;
+    }
+
+    if (req.body.apellidoMaterno !== undefined) {
+      alumnoEncontrado.apellidoMaterno = req.body.apellidoMaterno;
+    }
+
+    if (req.body.grado !== undefined) {
+      alumnoEncontrado.grado = req.body.grado;
+    }
+
+    if (req.body.grupo !== undefined) {
+      alumnoEncontrado.grupo = req.body.grupo;
+    }
+
+    if (req.body.observacionesGenerales !== undefined) {
+      alumnoEncontrado.observacionesGenerales = req.body.observacionesGenerales;
+    }
+
+    if (req.body.materias !== undefined) {
+      alumnoEncontrado.materias = req.body.materias;
+    }
+
+    if (req.body.actividades !== undefined) {
+      alumnoEncontrado.actividades = req.body.actividades;
+    }
+
+    await alumnoEncontrado.save();
+
+    return res.status(200).json({
+      mensaje: "Alumno actualizado con éxito",
+      alumnoEncontrado,
+    });
+  } catch (error) {
+    console.log(error);
+
+    return res.status(500).json({
+      error: true,
+      mensaje: "Error al actualizar alumno",
+      detalle: error.message,
+    });
+  }
+});
+
 // ==========================================
 // ELIMINAR ASISTENCIA
 // ==========================================
@@ -434,7 +434,6 @@ router.delete("/asistencias", verificarToken, async (req, res) => {
     const alumnos = await Alumnos.find({
       usuarioId: req.usuarioId,
       escuelaId: req.escuelaId,
-      "materias.claseId": claseId,
     });
 
     let eliminadas = 0;
@@ -491,7 +490,6 @@ router.delete("/actividades", verificarToken, async (req, res) => {
     const alumnos = await Alumnos.find({
       usuarioId: req.usuarioId,
       escuelaId: req.escuelaId,
-      "materias.claseId": claseId,
     });
 
     let eliminadas = 0;
