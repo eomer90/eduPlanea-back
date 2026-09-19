@@ -226,14 +226,37 @@ router.patch("/:id", verificarToken, async (req, res) => {
       });
     }
 
-    alumnoEncontrado.nombre = req.body.nombre;
-    alumnoEncontrado.apellidoPaterno = req.body.apellidoPaterno;
-    alumnoEncontrado.apellidoMaterno = req.body.apellidoMaterno;
-    alumnoEncontrado.grado = req.body.grado;
-    alumnoEncontrado.grupo = req.body.grupo;
-    alumnoEncontrado.observacionesGenerales = req.body.observacionesGenerales;
-    alumnoEncontrado.materias = req.body.materias;
-    alumnoEncontrado.actividades = req.body.actividades || [];
+    if (req.body.nombre !== undefined) {
+      alumnoEncontrado.nombre = req.body.nombre;
+    }
+
+    if (req.body.apellidoPaterno !== undefined) {
+      alumnoEncontrado.apellidoPaterno = req.body.apellidoPaterno;
+    }
+
+    if (req.body.apellidoMaterno !== undefined) {
+      alumnoEncontrado.apellidoMaterno = req.body.apellidoMaterno;
+    }
+
+    if (req.body.grado !== undefined) {
+      alumnoEncontrado.grado = req.body.grado;
+    }
+
+    if (req.body.grupo !== undefined) {
+      alumnoEncontrado.grupo = req.body.grupo;
+    }
+
+    if (req.body.observacionesGenerales !== undefined) {
+      alumnoEncontrado.observacionesGenerales = req.body.observacionesGenerales;
+    }
+
+    if (req.body.materias !== undefined) {
+      alumnoEncontrado.materias = req.body.materias;
+    }
+
+    if (req.body.actividades !== undefined) {
+      alumnoEncontrado.actividades = req.body.actividades;
+    }
 
     await alumnoEncontrado.save();
 
